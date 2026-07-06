@@ -8,6 +8,12 @@
     },
     {
       "path": "./web"
+    },
+    {
+      "path": "./backend-e2e"
+    },
+    {
+      "path": "./backend"
     }
   ]
 }
