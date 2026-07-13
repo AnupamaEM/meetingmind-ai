@@ -1,83 +1,86 @@
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
+interface ActionItem {
+  task: string;
+  owner: string;
+  deadline: string;
+  status: string;
+}
 
-export default function MeetingDetails(){
+interface Meeting {
+  _id: string;
+  title: string;
+  notes: string;
+  summary: string;
+  actionItems: ActionItem[];
+}
 
+export default function MeetingDetails() {
+  const { id } = useParams();
+  const [meeting, setMeeting] = useState<Meeting | null>(null);
+  const [error, setError] = useState('');
 
-return (
+  useEffect(() => {
+    async function loadMeeting() {
+      if (!id) {
+        setError('Meeting id is missing.');
+        return;
+      }
 
-<div className="p-10">
+      try {
+        const response = await fetch(`/api/meetings/${id}`);
 
+        if (!response.ok) {
+          throw new Error('Unable to load meeting details.');
+        }
 
-<h1 className="text-3xl font-bold">
+        const data = await response.json();
+        setMeeting(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unable to load meeting details.');
+      }
+    }
 
-Sprint Planning
+    loadMeeting();
+  }, [id]);
 
-</h1>
+  if (error) {
+    return <div className="p-10 text-red-600">{error}</div>;
+  }
 
+  if (!meeting) {
+    return <div className="p-10">Loading meeting details...</div>;
+  }
 
+  return (
+    <div className="p-10">
+      <h1 className="text-3xl font-bold">{meeting.title}</h1>
 
-<button
+      <div className="border p-5 rounded mt-10">
+        <h2 className="font-bold text-xl">AI Summary</h2>
+        <p className="mt-3">{meeting.summary || 'AI generated summary will appear here...'}</p>
+      </div>
 
-className="bg-purple-600 text-white px-5 py-3 rounded mt-5"
+      <div className="border p-5 rounded mt-5">
+        <h2 className="font-bold text-xl">Notes</h2>
+        <p className="mt-3 whitespace-pre-wrap">{meeting.notes || 'No notes available.'}</p>
+      </div>
 
->
-
-Generate AI Summary ✨
-
-</button>
-
-
-
-<div className="border p-5 rounded mt-10">
-
-
-<h2 className="font-bold text-xl">
-
-AI Summary
-
-</h2>
-
-
-<p className="mt-3">
-
-AI generated summary will appear here...
-
-</p>
-
-
-</div>
-
-
-
-<div className="border p-5 rounded mt-5">
-
-
-<h2 className="font-bold text-xl">
-
-Action Items
-
-</h2>
-
-
-<ul>
-
-<li>
-Fix login bug - John
-</li>
-
-<li>
-Deploy backend - Sarah
-</li>
-
-</ul>
-
-
-</div>
-
-
-
-</div>
-
-)
-
+      <div className="border p-5 rounded mt-5">
+        <h2 className="font-bold text-xl">Action Items</h2>
+        {meeting.actionItems?.length ? (
+          <ul className="mt-3 space-y-2">
+            {meeting.actionItems.map((item, index) => (
+              <li key={`${item.task}-${index}`}>
+                {`${item.task} - ${item.owner}`}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3">No action items yet.</p>
+        )}
+      </div>
+    </div>
+  );
 }

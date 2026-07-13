@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 
 import {
   Meeting,
@@ -34,6 +34,10 @@ export class MeetingService {
   }
 
   async findOne(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException('Meeting not found');
+    }
+
     const meeting =
       await this.meetingModel.findById(id);
 
@@ -50,6 +54,10 @@ export class MeetingService {
     id: string,
     updateMeetingDto: UpdateMeetingDto,
   ) {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException('Meeting not found');
+    }
+
     const meeting =
       await this.meetingModel.findByIdAndUpdate(
         id,
@@ -69,6 +77,10 @@ export class MeetingService {
   }
 
   async remove(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException('Meeting not found');
+    }
+
     const meeting =
       await this.meetingModel.findByIdAndDelete(id);
 
