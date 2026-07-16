@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { MeetingModule } from './meeting/meeting.module';
-
+import { AiModule } from './ai/ai.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -20,8 +20,8 @@ import { AppService } from './app.service';
       }),
     }),
 
-    // 👇 Register the Meeting module here
     MeetingModule,
+    AiModule,
   ],
 
   controllers: [AppController],
